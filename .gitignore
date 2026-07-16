@@ -8,6 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 VERCEL_DEPLOYMENT.md
+CLIENT_DEPLOYMENT.md
+.env.local
 
 node_modules
 dist

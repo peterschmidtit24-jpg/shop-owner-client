@@ -1,15 +1,17 @@
 import { useState } from 'react'
-import { Cuboid, Grid2X2, Package, ShoppingCart, X } from 'lucide-react'
+import { Cuboid, Grid2X2, Package, ShoppingCart, Users, X } from 'lucide-react'
 import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
 import { DashboardPage } from './pages/DashboardPage'
 import { OrdersPage } from './pages/OrdersPage'
 import { ProductsPage } from './pages/ProductsPage'
+import { CustomersPage } from './pages/CustomersPage'
 import './App.css'
 
 const navItems = [
   { label: 'Dashboard', path: '/', icon: Grid2X2 },
   { label: 'Products', path: '/products', icon: Package },
   { label: 'Orders', path: '/orders', icon: ShoppingCart },
+  { label: 'Customers', path: '/customers', icon: Users },
 ]
 
 function App() {
@@ -69,6 +71,7 @@ function App() {
           <Route path="/" element={<DashboardPage onOpenMenu={openMenu} onNavigate={(page) => navigate(`/${page.toLowerCase()}`)} />} />
           <Route path="/products" element={<ProductsPage onOpenMenu={openMenu} />} />
           <Route path="/orders" element={<OrdersPage onOpenMenu={openMenu} />} />
+          <Route path="/customers" element={<CustomersPage onOpenMenu={openMenu} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>

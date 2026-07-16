@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react'
-import { LoaderCircle, Menu, Pencil, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react'
+import { LayoutGrid, List, LoaderCircle, Menu, Pencil, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react'
 import { getProducts, type Product } from '../api/products'
 import { DeleteProductDialog } from '../components/DeleteProductDialog'
 import { ProductDetailsDialog } from '../components/ProductDetailsDialog'
 import { ProductDialog } from '../components/ProductDialog'
+import { ProductCard } from '../components/ProductCard'
 
 type ProductsPageProps = {
   onOpenMenu: () => void
 }
 
 export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
+  const [view, setView] = useState<'cards' | 'list'>('cards')
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -72,22 +74,30 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
           </button>
         </header>
 
-        <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-          <div className="grid shrink-0 grid-cols-[1fr_70px_84px] border-b border-zinc-100 px-5 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400 sm:grid-cols-[1fr_120px_90px_96px] sm:px-7">
-            <span>Product</span>
-            <span className="hidden sm:block">Price</span>
-            <span className="text-right sm:text-left">Stock</span><span className="sr-only">Actions</span>
+        <div className="mb-4 flex shrink-0 justify-end">
+          <div className="flex rounded-xl border border-zinc-200 bg-white p-1" aria-label="Product layout">
+            <button type="button" aria-label="Card view" title="Card view" aria-pressed={view === 'cards'} onClick={() => setView('cards')} className={`rounded-lg p-2 transition ${view === 'cards' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700'}`}><LayoutGrid size={17} /></button>
+            <button type="button" aria-label="List view" title="List view" aria-pressed={view === 'list'} onClick={() => setView('list')} className={`rounded-lg p-2 transition ${view === 'list' ? 'bg-zinc-900 text-white shadow-sm' : 'text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700'}`}><List size={17} /></button>
           </div>
+        </div>
 
-          <div className="min-h-0 overflow-y-auto">
+        <section className={`min-h-0 flex-1 overflow-y-auto ${view === 'list' ? 'rounded-2xl border border-zinc-200 bg-white' : ''}`}>
+          {view === 'list' && (
+            <div className="sticky top-0 z-10 grid grid-cols-[1fr_70px_84px] border-b border-zinc-100 bg-white px-5 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400 sm:grid-cols-[1fr_120px_90px_96px] sm:px-7">
+              <span>Product</span>
+              <span className="hidden sm:block">Price</span>
+              <span className="text-right sm:text-left">Stock</span><span className="sr-only">Actions</span>
+            </div>
+          )}
+
             {isLoading && (
-              <div className="grid h-48 place-items-center text-sm text-zinc-400">
+              <div className="grid h-48 place-items-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-400">
                 <span className="flex items-center gap-2"><LoaderCircle size={18} className="animate-spin" /> Loading products...</span>
               </div>
             )}
 
             {!isLoading && error && (
-              <div className="grid h-48 place-items-center px-6 text-center">
+              <div className="grid h-48 place-items-center rounded-2xl border border-zinc-200 bg-white px-6 text-center">
                 <div>
                   <p className="text-sm text-red-600">{error}</p>
                   <button onClick={() => void loadProducts()} className="mx-auto mt-4 flex items-center gap-2 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50">
@@ -98,10 +108,18 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
             )}
 
             {!isLoading && !error && products.length === 0 && (
-              <div className="grid h-48 place-items-center text-sm text-zinc-400">No products found.</div>
+              <div className="grid h-48 place-items-center rounded-2xl border border-zinc-200 bg-white text-sm text-zinc-400">No products found.</div>
             )}
 
-            {!isLoading && !error && products.map((product) => (
+            {!isLoading && !error && view === 'cards' && (
+              <div className="grid gap-5 pb-2 sm:grid-cols-2 xl:grid-cols-3">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} onSelect={setSelectedProduct} onEdit={setEditingProduct} onDelete={setDeletingProduct} />
+                ))}
+              </div>
+            )}
+
+            {!isLoading && !error && view === 'list' && products.map((product) => (
               <article
                 key={product.id}
                 role="button"
@@ -139,7 +157,6 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
                 </div>
               </article>
             ))}
-          </div>
         </section>
       </div>
 

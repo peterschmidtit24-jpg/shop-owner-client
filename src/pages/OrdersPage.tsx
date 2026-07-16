@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
-import { LoaderCircle, Menu, RefreshCw } from 'lucide-react'
+import { LoaderCircle, Menu, Plus, RefreshCw } from 'lucide-react'
 import {
   getOrders,
   updateOrderStatus,
   type Order,
   type OrderStatus,
 } from '../api/orders'
+import { OrderDialog } from '../components/OrderDialog'
 
 type OrdersPageProps = {
   onOpenMenu: () => void
@@ -23,6 +24,7 @@ export function OrdersPage({ onOpenMenu }: OrdersPageProps) {
   const [error, setError] = useState('')
   const [savingOrderId, setSavingOrderId] = useState<string | null>(null)
   const [notice, setNotice] = useState('')
+  const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false)
 
   async function loadOrders() {
     setIsLoading(true)
@@ -89,16 +91,21 @@ export function OrdersPage({ onOpenMenu }: OrdersPageProps) {
 
   return (
     <div className="mx-auto flex h-screen max-w-[1320px] flex-col overflow-hidden px-5 py-7 sm:px-8 lg:px-12 lg:py-11">
-      <header className="mb-9 flex shrink-0 items-start gap-3">
-        <button aria-label="Open navigation" className="mt-1 rounded-lg border border-zinc-200 bg-white p-2 md:hidden" onClick={onOpenMenu}>
-          <Menu size={20} />
-        </button>
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-zinc-950">Orders</h1>
-          <p className="mt-1 text-sm text-zinc-400">
-            {isLoading ? 'Loading orders...' : `${orders.length} total orders`}
-          </p>
+      <header className="mb-9 flex shrink-0 items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <button aria-label="Open navigation" className="mt-1 rounded-lg border border-zinc-200 bg-white p-2 md:hidden" onClick={onOpenMenu}>
+            <Menu size={20} />
+          </button>
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-zinc-950">Orders</h1>
+            <p className="mt-1 text-sm text-zinc-400">
+              {isLoading ? 'Loading orders...' : `${orders.length} total orders`}
+            </p>
+          </div>
         </div>
+        <button type="button" onClick={() => setIsOrderDialogOpen(true)} className="flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-700 active:scale-[0.98] sm:px-5">
+          <Plus size={17} /><span className="hidden sm:inline">Add Order</span><span className="sm:hidden">Add</span>
+        </button>
       </header>
 
       <div className="mb-7 shrink-0 overflow-x-auto">
@@ -160,6 +167,19 @@ export function OrdersPage({ onOpenMenu }: OrdersPageProps) {
 
       {notice && (
         <div className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-zinc-900 px-5 py-3 text-sm text-white shadow-xl">{notice}</div>
+      )}
+
+      {isOrderDialogOpen && (
+        <OrderDialog
+          onCancel={() => setIsOrderDialogOpen(false)}
+          onSaved={(newOrder) => {
+            setOrders((currentOrders) => [newOrder, ...currentOrders])
+            setActiveFilter('ALL')
+            setIsOrderDialogOpen(false)
+            setNotice('Order created successfully.')
+            window.setTimeout(() => setNotice(''), 2500)
+          }}
+        />
       )}
     </div>
   )
