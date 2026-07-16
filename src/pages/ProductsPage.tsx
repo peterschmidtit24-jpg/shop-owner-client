@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react'
-import { LoaderCircle, Menu, Plus, RefreshCw, Sparkles } from 'lucide-react'
+import { LoaderCircle, Menu, Pencil, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react'
 import { getProducts, type Product } from '../api/products'
+import { DeleteProductDialog } from '../components/DeleteProductDialog'
+import { ProductDetailsDialog } from '../components/ProductDetailsDialog'
+import { ProductDialog } from '../components/ProductDialog'
 
 type ProductsPageProps = {
   onOpenMenu: () => void
@@ -11,6 +14,10 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+  const [isAddingProduct, setIsAddingProduct] = useState(false)
+  const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
   async function loadProducts() {
     setIsLoading(true)
@@ -43,11 +50,6 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
     return () => controller.abort()
   }, [])
 
-  function showAddProductNotice() {
-    setNotice('Adding products will be connected next.')
-    window.setTimeout(() => setNotice(''), 2200)
-  }
-
   return (
     <>
       <div className="mx-auto flex h-screen max-w-[1320px] flex-col overflow-hidden px-5 py-7 sm:px-8 lg:px-12 lg:py-11">
@@ -63,7 +65,7 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
               </p>
             </div>
           </div>
-          <button onClick={showAddProductNotice} className="flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-700 active:scale-[0.98] sm:px-6">
+          <button onClick={() => setIsAddingProduct(true)} className="flex items-center gap-2 rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-zinc-700 active:scale-[0.98] sm:px-6">
             <Plus size={17} />
             <span className="hidden sm:inline">Add Product</span>
             <span className="sm:hidden">Add</span>
@@ -71,10 +73,10 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
         </header>
 
         <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-          <div className="grid shrink-0 grid-cols-[1fr_90px] border-b border-zinc-100 px-5 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400 sm:grid-cols-[1fr_120px_100px] sm:px-7">
+          <div className="grid shrink-0 grid-cols-[1fr_70px_84px] border-b border-zinc-100 px-5 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400 sm:grid-cols-[1fr_120px_90px_96px] sm:px-7">
             <span>Product</span>
             <span className="hidden sm:block">Price</span>
-            <span className="text-right sm:text-left">Stock</span>
+            <span className="text-right sm:text-left">Stock</span><span className="sr-only">Actions</span>
           </div>
 
           <div className="min-h-0 overflow-y-auto">
@@ -100,7 +102,19 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
             )}
 
             {!isLoading && !error && products.map((product) => (
-              <article key={product.id} className="grid grid-cols-[1fr_90px] items-center gap-3 border-b border-zinc-100 px-5 py-4 last:border-0 sm:grid-cols-[1fr_120px_100px] sm:px-7">
+              <article
+                key={product.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => setSelectedProduct(product)}
+                onKeyDown={(event) => {
+                  if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
+                    event.preventDefault()
+                    setSelectedProduct(product)
+                  }
+                }}
+                className="grid cursor-pointer grid-cols-[1fr_70px_84px] items-center gap-3 border-b border-zinc-100 px-5 py-4 transition last:border-0 hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-indigo-500 sm:grid-cols-[1fr_120px_90px_96px] sm:px-7"
+              >
                 <div className="flex min-w-0 items-center gap-4">
                   {product.imageUrl ? (
                     <img src={product.imageUrl} alt="" className="h-12 w-12 shrink-0 rounded-xl bg-zinc-100 object-cover" />
@@ -119,6 +133,10 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
                 <span className={`text-right text-sm font-semibold sm:text-left ${product.stock <= 3 ? 'text-red-500' : product.stock <= 10 ? 'text-amber-600' : 'text-zinc-700'}`}>
                   {product.stock}
                 </span>
+                <div className="flex justify-end gap-2">
+                  <button onClick={(event) => { event.stopPropagation(); setEditingProduct(product) }} aria-label={`Edit ${product.name}`} className="rounded-lg border border-zinc-200 p-2 text-zinc-500 transition hover:bg-white hover:text-zinc-900"><Pencil size={15} /></button>
+                  <button onClick={(event) => { event.stopPropagation(); setDeletingProduct(product) }} aria-label={`Delete ${product.name}`} className="rounded-lg border border-zinc-200 p-2 text-zinc-500 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600"><Trash2 size={15} /></button>
+                </div>
               </article>
             ))}
           </div>
@@ -129,6 +147,48 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
         <div className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-zinc-900 px-5 py-3 text-sm text-white shadow-xl">
           <Sparkles size={16} className="text-indigo-400" /> {notice}
         </div>
+      )}
+
+      {editingProduct && (
+        <ProductDialog
+          product={editingProduct}
+          onCancel={() => setEditingProduct(null)}
+          onUpdated={(updatedProduct) => {
+            setProducts((current) => current.map((product) => product.id === updatedProduct.id ? updatedProduct : product))
+            setEditingProduct(null)
+            setNotice('Product updated successfully.')
+            window.setTimeout(() => setNotice(''), 2200)
+          }}
+        />
+      )}
+
+      {isAddingProduct && (
+        <ProductDialog
+          onCancel={() => setIsAddingProduct(false)}
+          onSaved={(newProduct) => {
+            setProducts((current) => [newProduct, ...current])
+            setIsAddingProduct(false)
+            setNotice('Product added successfully.')
+            window.setTimeout(() => setNotice(''), 2200)
+          }}
+        />
+      )}
+
+      {deletingProduct && (
+        <DeleteProductDialog
+          product={deletingProduct}
+          onCancel={() => setDeletingProduct(null)}
+          onDeleted={(productId) => {
+            setProducts((current) => current.filter((product) => product.id !== productId))
+            setDeletingProduct(null)
+            setNotice('Product deleted successfully.')
+            window.setTimeout(() => setNotice(''), 2200)
+          }}
+        />
+      )}
+
+      {selectedProduct && (
+        <ProductDetailsDialog product={selectedProduct} onClose={() => setSelectedProduct(null)} />
       )}
     </>
   )
