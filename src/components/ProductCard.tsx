@@ -30,9 +30,9 @@ export function ProductCard({ product, onSelect, onEdit, onDelete }: ProductCard
       onKeyDown={handleKeyDown}
       className="group flex min-h-full cursor-pointer flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white transition hover:-translate-y-0.5 hover:border-zinc-300 hover:shadow-lg hover:shadow-zinc-200/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
+      <div className="relative h-52 overflow-hidden bg-zinc-100 sm:h-56">
         {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.03]" />
+          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain p-4 transition duration-300 group-hover:scale-[1.02]" />
         ) : (
           <div className="grid h-full place-items-center bg-indigo-50 text-indigo-500"><Package size={38} /></div>
         )}
