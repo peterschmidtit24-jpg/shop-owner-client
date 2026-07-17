@@ -1,3 +1,4 @@
+/** Create/edit form modal for catalogue products. */
 import { useEffect, useState, type FormEvent } from 'react'
 import axios from 'axios'
 import { LoaderCircle, X } from 'lucide-react'
@@ -10,6 +11,13 @@ type ProductDialogProps = {
   onUpdated?: (product: Product) => void
 }
 
+/**
+ * Uses the optional `product` prop to switch between create and edit mode.
+ * @param product - Existing product to edit; omitted when creating.
+ * @param onCancel - Closes the dialog without saving.
+ * @param onSaved - Receives a newly created product.
+ * @param onUpdated - Receives an updated existing product.
+ */
 export function ProductDialog({ product, onCancel, onSaved, onUpdated }: ProductDialogProps) {
   const isEditing = Boolean(product)
   const [name, setName] = useState(product?.name ?? '')
@@ -21,6 +29,7 @@ export function ProductDialog({ product, onCancel, onSaved, onUpdated }: Product
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
+    /** Handles keyboard dismissal while no save request is running. */
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === 'Escape' && !isSaving) onCancel()
     }
@@ -28,6 +37,7 @@ export function ProductDialog({ product, onCancel, onSaved, onUpdated }: Product
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [isSaving, onCancel])
 
+  /** Validates form values, calls the correct product API, and reports success. */
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     const parsedPrice = Number(price)

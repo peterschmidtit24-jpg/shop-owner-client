@@ -1,3 +1,4 @@
+/** Confirmation modal for safely deleting a catalogue product. */
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { LoaderCircle, TriangleAlert, X } from 'lucide-react'
@@ -9,11 +10,17 @@ type DeleteProductDialogProps = {
   onDeleted: (productId: string) => void
 }
 
+/**
+ * @param product - Product the user intends to delete.
+ * @param onCancel - Closes the dialog without changing data.
+ * @param onDeleted - Receives the product ID after successful deletion.
+ */
 export function DeleteProductDialog({ product, onCancel, onDeleted }: DeleteProductDialogProps) {
   const [isDeleting, setIsDeleting] = useState(false)
   const [error, setError] = useState('')
 
   useEffect(() => {
+    /** Handles Escape dismissal unless deletion is already in progress. */
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === 'Escape' && !isDeleting) onCancel()
     }
@@ -21,6 +28,7 @@ export function DeleteProductDialog({ product, onCancel, onDeleted }: DeleteProd
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [isDeleting, onCancel])
 
+  /** Calls the delete API and reports success or a user-facing error. */
   async function handleDelete() {
     setIsDeleting(true)
     setError('')

@@ -1,3 +1,4 @@
+/** Dashboard list highlighting products that may need replenishment. */
 import { AlertTriangle } from 'lucide-react'
 
 export type LowStockProduct = {
@@ -8,6 +9,7 @@ export type LowStockProduct = {
   imageUrl: string | null
 }
 
+/** @param products - Products selected by the dashboard's low-stock threshold. */
 export function LowStockList({ products }: { products: LowStockProduct[] }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white xl:col-span-2">
@@ -36,6 +38,7 @@ export function LowStockList({ products }: { products: LowStockProduct[] }) {
   )
 }
 
+/** @param name - Product name. @returns A two-letter image fallback. */
 function getInitials(name: string) {
   return name.split(' ').map((word) => word[0]).join('').slice(0, 2).toUpperCase()
 }

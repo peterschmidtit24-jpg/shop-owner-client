@@ -1,3 +1,4 @@
+/** Read-only modal that presents the complete details of one product. */
 import { useEffect } from 'react'
 import { Package, X } from 'lucide-react'
 import type { Product } from '../api/products'
@@ -7,8 +8,13 @@ type ProductDetailsDialogProps = {
   onClose: () => void
 }
 
+/**
+ * @param product - Product to inspect.
+ * @param onClose - Called by the close button, backdrop, or Escape key.
+ */
 export function ProductDetailsDialog({ product, onClose }: ProductDetailsDialogProps) {
   useEffect(() => {
+    /** Handles keyboard dismissal while the dialog is mounted. */
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === 'Escape') onClose()
     }

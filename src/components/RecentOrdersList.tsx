@@ -1,3 +1,4 @@
+/** Dashboard table for the most recently created orders. */
 import { ChevronRight } from 'lucide-react'
 import { Badge } from './Badge'
 
@@ -11,6 +12,10 @@ const statusStyles: Record<OrderStatus, string> = {
   Cancelled: 'border-zinc-200 bg-zinc-100 text-zinc-500',
 }
 
+/**
+ * @param orders - Formatted order rows to preview.
+ * @param onViewAll - Callback that opens the full Orders page.
+ */
 export function RecentOrdersList({ orders, onViewAll }: { orders: Order[]; onViewAll: () => void }) {
   return (
     <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white xl:col-span-3">

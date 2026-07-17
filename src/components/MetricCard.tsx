@@ -1,3 +1,4 @@
+/** Dashboard summary card for one business metric. */
 import type { ComponentType, ReactNode } from 'react'
 
 type MetricCardProps = {
@@ -9,6 +10,10 @@ type MetricCardProps = {
   children?: ReactNode
 }
 
+/**
+ * Displays a metric title, value, icon, optional note, and detail content.
+ * Props supply the visible values and the icon styling for this metric.
+ */
 export function MetricCard({
   title,
   value,

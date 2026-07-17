@@ -1,3 +1,4 @@
+/** Interactive catalogue card for viewing and managing one product. */
 import { Package, Pencil, Trash2 } from 'lucide-react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 import type { Product } from '../api/products'
@@ -9,7 +10,15 @@ type ProductCardProps = {
   onDelete: (product: Product) => void
 }
 
+/**
+ * Displays one product and exposes select, edit, and delete callbacks.
+ * @param product - Product represented by the card.
+ * @param onSelect - Called when the card is activated.
+ * @param onEdit - Called from the edit action.
+ * @param onDelete - Called from the delete action.
+ */
 export function ProductCard({ product, onSelect, onEdit, onDelete }: ProductCardProps) {
+  /** Activates selection with Enter or Space for keyboard accessibility. */
   function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.target === event.currentTarget && (event.key === 'Enter' || event.key === ' ')) {
       event.preventDefault()
@@ -17,6 +26,7 @@ export function ProductCard({ product, onSelect, onEdit, onDelete }: ProductCard
     }
   }
 
+  /** Runs an action without also triggering the card's selection handler. */
   function handleAction(event: MouseEvent<HTMLButtonElement>, action: (product: Product) => void) {
     event.stopPropagation()
     action(product)
@@ -57,6 +67,7 @@ export function ProductCard({ product, onSelect, onEdit, onDelete }: ProductCard
   )
 }
 
+/** @param stock - Available units. @returns Tailwind color classes for the stock level. */
 function stockColor(stock: number) {
   if (stock <= 3) return 'text-red-600'
   if (stock <= 10) return 'text-amber-600'

@@ -1,3 +1,9 @@
+/**
+ * Root application shell and client-side navigation.
+ *
+ * Owns the responsive sidebar state, declares the available pages, and renders
+ * the selected page through React Router.
+ */
 import { useState } from 'react'
 import { Cuboid, Grid2X2, Package, ShoppingCart, Users, X } from 'lucide-react'
 import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
@@ -14,9 +20,15 @@ const navItems = [
   { label: 'Customers', path: '/customers', icon: Users },
 ]
 
+/**
+ * Renders the complete Shop Owner interface and its routes.
+ *
+ * @returns The responsive navigation shell and active page content.
+ */
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
+  /** Opens the mobile sidebar; passed to pages as their menu-button callback. */
   const openMenu = () => setSidebarOpen(true)
 
   return (

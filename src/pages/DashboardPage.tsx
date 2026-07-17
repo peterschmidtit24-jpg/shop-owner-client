@@ -1,3 +1,4 @@
+/** Operational dashboard summarizing orders, revenue, stock, and activity. */
 import { useEffect, useState } from 'react'
 import { AlertTriangle, Boxes, CircleDollarSign, Menu, RefreshCw, ShoppingCart, Sparkles, Zap } from 'lucide-react'
 import { getOrders, type Order as ApiOrder, type OrderStatus as ApiOrderStatus } from '../api/orders'
@@ -9,6 +10,7 @@ import { RecentOrdersList, type Order as RecentOrder, type OrderStatus } from '.
 
 type DashboardPageProps = { onOpenMenu: () => void; onNavigate: (page: string) => void }
 
+/** Aggregates product and order data into dashboard metrics and lists. */
 export function DashboardPage({ onOpenMenu, onNavigate }: DashboardPageProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [orders, setOrders] = useState<ApiOrder[]>([])
@@ -16,6 +18,7 @@ export function DashboardPage({ onOpenMenu, onNavigate }: DashboardPageProps) {
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
 
+  /** Fetches dashboard source data together and refreshes displayed summaries. */
   async function loadDashboard() {
     setIsLoading(true)
     setError('')
@@ -49,6 +52,7 @@ export function DashboardPage({ onOpenMenu, onNavigate }: DashboardPageProps) {
     return () => controller.abort()
   }, [])
 
+  /** Shows temporary order guidance before navigating to the Orders page. */
   function showSimulateNotice() {
     setNotice('The order simulation form will be connected next.')
     window.setTimeout(() => setNotice(''), 2500)
@@ -117,18 +121,22 @@ export function DashboardPage({ onOpenMenu, onNavigate }: DashboardPageProps) {
   )
 }
 
+/** @param status - Uppercase API status. @returns Dashboard display status. */
 function formatOrderStatus(status: ApiOrderStatus): OrderStatus {
   return (status.charAt(0) + status.slice(1).toLowerCase()) as OrderStatus
 }
 
+/** @param value - Numeric amount. @returns USD currency text. */
 function formatCurrency(value: number) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value)
 }
 
+/** @param date - ISO date string. @returns Compact order date. */
 function formatDate(date: string) {
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(date))
 }
 
+/** @param date - Date instance. @returns Long heading-friendly date. */
 function formatLongDate(date: Date) {
   return new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }).format(date)
 }

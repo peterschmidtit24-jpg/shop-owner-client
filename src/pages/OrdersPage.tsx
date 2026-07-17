@@ -1,3 +1,4 @@
+/** Order-management page for creation, filtering, and status updates. */
 import { useEffect, useState } from 'react'
 import { LoaderCircle, Menu, Plus, RefreshCw } from 'lucide-react'
 import {
@@ -17,6 +18,7 @@ type OrderFilter = 'ALL' | OrderStatus
 const filters: OrderFilter[] = ['ALL', 'PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED']
 const statuses: OrderStatus[] = ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED']
 
+/** @param onOpenMenu - Opens the application sidebar on small screens. */
 export function OrdersPage({ onOpenMenu }: OrdersPageProps) {
   const [orders, setOrders] = useState<Order[]>([])
   const [activeFilter, setActiveFilter] = useState<OrderFilter>('ALL')
@@ -26,6 +28,7 @@ export function OrdersPage({ onOpenMenu }: OrdersPageProps) {
   const [notice, setNotice] = useState('')
   const [isOrderDialogOpen, setIsOrderDialogOpen] = useState(false)
 
+  /** Reloads orders and maintains request feedback state. */
   async function loadOrders() {
     setIsLoading(true)
     setError('')
@@ -66,6 +69,7 @@ export function OrdersPage({ onOpenMenu }: OrdersPageProps) {
     ? orders
     : orders.filter((order) => order.status === activeFilter)
 
+  /** Persists `status` for `orderId` and updates the matching local row. */
   async function changeOrderStatus(orderId: string, status: OrderStatus) {
     setSavingOrderId(orderId)
     setNotice('')
@@ -85,6 +89,7 @@ export function OrdersPage({ onOpenMenu }: OrdersPageProps) {
     }
   }
 
+  /** @param filter - Status tab. @returns Number of represented orders. */
   function getFilterCount(filter: OrderFilter) {
     return filter === 'ALL' ? orders.length : counts[filter]
   }
@@ -185,10 +190,12 @@ export function OrdersPage({ onOpenMenu }: OrdersPageProps) {
   )
 }
 
+/** @param status - API status. @returns Sentence-case display label. */
 function formatStatus(status: OrderFilter) {
   return status.charAt(0) + status.slice(1).toLowerCase()
 }
 
+/** @param date - ISO date string. @returns Localized short date. */
 function formatDate(date: string) {
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(date))
 }

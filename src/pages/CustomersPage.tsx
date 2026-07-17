@@ -1,3 +1,4 @@
+/** Customer-management page for reviewing and editing customer profiles. */
 import { useEffect, useState } from 'react'
 import { LoaderCircle, Mail, Menu, Pencil, RefreshCw, UserRound } from 'lucide-react'
 import { getCustomers, type Customer } from '../api/customers'
@@ -7,12 +8,14 @@ type CustomersPageProps = {
   onOpenMenu: () => void
 }
 
+/** @param onOpenMenu - Opens the application sidebar on small screens. */
 export function CustomersPage({ onOpenMenu }: CustomersPageProps) {
   const [customers, setCustomers] = useState<Customer[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null)
 
+  /** Reloads customers and maintains request feedback state. */
   async function loadCustomers() {
     setIsLoading(true)
     setError('')
@@ -130,6 +133,7 @@ export function CustomersPage({ onOpenMenu }: CustomersPageProps) {
   )
 }
 
+/** @param date - ISO date string. @returns Localized customer-since date. */
 function formatDate(date: string) {
   return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(date))
 }

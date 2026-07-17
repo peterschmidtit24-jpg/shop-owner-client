@@ -1,3 +1,4 @@
+/** Edit form modal for an existing customer's profile. */
 import { useEffect, useState, type FormEvent } from 'react'
 import axios from 'axios'
 import { LoaderCircle, X } from 'lucide-react'
@@ -9,6 +10,11 @@ type CustomerDialogProps = {
   onUpdated: (customer: Customer) => void
 }
 
+/**
+ * @param customer - Customer whose name and email are being edited.
+ * @param onCancel - Closes the dialog without saving.
+ * @param onUpdated - Receives the updated customer returned by the API.
+ */
 export function CustomerDialog({ customer, onCancel, onUpdated }: CustomerDialogProps) {
   const [name, setName] = useState(customer.name)
   const [email, setEmail] = useState(customer.email ?? '')
@@ -16,6 +22,7 @@ export function CustomerDialog({ customer, onCancel, onUpdated }: CustomerDialog
   const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
+    /** Handles keyboard dismissal while no save request is running. */
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === 'Escape' && !isSaving) onCancel()
     }
@@ -23,6 +30,7 @@ export function CustomerDialog({ customer, onCancel, onUpdated }: CustomerDialog
     return () => window.removeEventListener('keydown', closeOnEscape)
   }, [isSaving, onCancel])
 
+  /** Validates and submits the customer's normalized name and email. */
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!name.trim()) return setError('Name is required.')

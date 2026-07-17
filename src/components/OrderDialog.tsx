@@ -1,3 +1,4 @@
+/** Order creation modal that connects products with new or existing customers. */
 import { useEffect, useState, type FormEvent } from 'react'
 import axios from 'axios'
 import { LoaderCircle, X } from 'lucide-react'
@@ -10,6 +11,11 @@ type OrderDialogProps = {
   onSaved: (order: Order) => void
 }
 
+/**
+ * Loads selectable products/customers and submits a new order.
+ * @param onCancel - Closes the dialog without creating an order.
+ * @param onSaved - Receives the order returned by the API.
+ */
 export function OrderDialog({ onCancel, onSaved }: OrderDialogProps) {
   const [products, setProducts] = useState<Product[]>([])
   const [customers, setCustomers] = useState<Customer[]>([])
@@ -46,6 +52,7 @@ export function OrderDialog({ onCancel, onSaved }: OrderDialogProps) {
   }, [])
 
   useEffect(() => {
+    /** Handles keyboard dismissal while no creation request is running. */
     function closeOnEscape(event: KeyboardEvent) {
       if (event.key === 'Escape' && !isSaving) onCancel()
     }
@@ -59,6 +66,7 @@ export function OrderDialog({ onCancel, onSaved }: OrderDialogProps) {
     ? selectedProduct.price * parsedQuantity
     : 0
 
+  /** Validates the selection/customer fields and creates the order. */
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!productId) return setError('Select an available product.')

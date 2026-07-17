@@ -1,3 +1,4 @@
+/** Product-management page for browsing and maintaining the catalogue. */
 import { useEffect, useState } from 'react'
 import { LayoutGrid, List, LoaderCircle, Menu, Pencil, Plus, RefreshCw, Sparkles, Trash2 } from 'lucide-react'
 import { getProducts, type Product } from '../api/products'
@@ -10,6 +11,7 @@ type ProductsPageProps = {
   onOpenMenu: () => void
 }
 
+/** Loads products, supports view modes, and coordinates product dialogs. */
 export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
   const [view, setView] = useState<'cards' | 'list'>('cards')
   const [products, setProducts] = useState<Product[]>([])
@@ -21,6 +23,7 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null)
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
 
+  /** Reloads the catalogue and updates loading/error state. */
   async function loadProducts() {
     setIsLoading(true)
     setError('')
@@ -211,6 +214,7 @@ export function ProductsPage({ onOpenMenu }: ProductsPageProps) {
   )
 }
 
+/** @param name - Product name. @returns Up to two uppercase initials. */
 function getInitials(name: string) {
   return name.split(' ').map((word) => word[0]).join('').slice(0, 2).toUpperCase()
 }
