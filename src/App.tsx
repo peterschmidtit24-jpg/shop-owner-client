@@ -5,12 +5,14 @@
  * the selected page through React Router.
  */
 import { useState } from 'react'
-import { Cuboid, Grid2X2, Package, ShoppingCart, Users, X } from 'lucide-react'
+import { Cuboid, Grid2X2, LogOut, Package, ShoppingCart, Users, X } from 'lucide-react'
 import { Navigate, NavLink, Route, Routes, useNavigate } from 'react-router-dom'
 import { DashboardPage } from './pages/DashboardPage'
 import { OrdersPage } from './pages/OrdersPage'
 import { ProductsPage } from './pages/ProductsPage'
 import { CustomersPage } from './pages/CustomersPage'
+import { AuthPage, ConfirmEmailPage } from './pages/AuthPage'
+import { useAuth } from './auth/AuthContext'
 import './App.css'
 
 const navItems = [
@@ -26,10 +28,24 @@ const navItems = [
  * @returns The responsive navigation shell and active page content.
  */
 function App() {
+  const { owner, loading, signOut } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const navigate = useNavigate()
   /** Opens the mobile sidebar; passed to pages as their menu-button callback. */
   const openMenu = () => setSidebarOpen(true)
+
+  if (loading) {
+    return <div className="grid min-h-screen place-items-center bg-[#f7f7f9] text-sm text-zinc-500">Loading…</div>
+  }
+
+  if (!owner) {
+    return (
+      <Routes>
+        <Route path="/confirm-email" element={<ConfirmEmailPage />} />
+        <Route path="*" element={<AuthPage />} />
+      </Routes>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-[#f7f7f9]">
@@ -74,7 +90,11 @@ function App() {
         </nav>
 
         <div className="mt-auto border-t border-white/10 px-7 py-6 text-xs text-zinc-600">
-          v1.0&nbsp;&nbsp;·&nbsp;&nbsp;2026
+          <p className="truncate text-zinc-400">{owner.name}</p>
+          <p className="mt-1 truncate">{owner.email}</p>
+          <button className="mt-4 flex items-center gap-2 text-zinc-400 hover:text-white" onClick={() => void signOut()}>
+            <LogOut size={15} /> Sign out
+          </button>
         </div>
       </aside>
 
