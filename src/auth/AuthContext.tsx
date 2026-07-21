@@ -5,9 +5,9 @@ import type { Owner } from '../api/auth'
 type AuthContextValue = {
   owner: Owner | null
   loading: boolean
-  signIn: (email: string, password: string) => Promise<void>
+  signIn: (name: string, password: string) => Promise<void>
+  register: (name: string, password: string) => Promise<void>
   signOut: () => Promise<void>
-  completeConfirmation: (token: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -20,20 +20,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     authApi.getSession().then(setOwner).catch(() => setOwner(null)).finally(() => setLoading(false))
   }, [])
 
-  const signIn = useCallback(async (email: string, password: string) => setOwner(await authApi.login(email, password)), [])
+  const signIn = useCallback(async (name: string, password: string) => setOwner(await authApi.login(name, password)), [])
+  const register = useCallback(async (name: string, password: string) => setOwner(await authApi.register(name, password)), [])
   const signOut = useCallback(async () => {
     await authApi.logout()
     setOwner(null)
   }, [])
-  const completeConfirmation = useCallback(async (token: string) => setOwner(await authApi.confirmEmail(token)), [])
-
   const value: AuthContextValue = useMemo(() => ({
     owner,
     loading,
     signIn,
+    register,
     signOut,
-    completeConfirmation,
-  }), [owner, loading, signIn, signOut, completeConfirmation])
+  }), [owner, loading, signIn, register, signOut])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

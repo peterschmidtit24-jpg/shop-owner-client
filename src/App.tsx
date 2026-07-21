@@ -11,7 +11,7 @@ import { DashboardPage } from './pages/DashboardPage'
 import { OrdersPage } from './pages/OrdersPage'
 import { ProductsPage } from './pages/ProductsPage'
 import { CustomersPage } from './pages/CustomersPage'
-import { AuthPage, ConfirmEmailPage } from './pages/AuthPage'
+import { AuthPage } from './pages/AuthPage'
 import { useAuth } from './auth/AuthContext'
 import './App.css'
 
@@ -41,7 +41,6 @@ function App() {
   if (!owner) {
     return (
       <Routes>
-        <Route path="/confirm-email" element={<ConfirmEmailPage />} />
         <Route path="*" element={<AuthPage />} />
       </Routes>
     )
@@ -91,7 +90,6 @@ function App() {
 
         <div className="mt-auto border-t border-white/10 px-7 py-6 text-xs text-zinc-600">
           <p className="truncate text-zinc-400">{owner.name}</p>
-          <p className="mt-1 truncate">{owner.email}</p>
           <button className="mt-4 flex items-center gap-2 text-zinc-400 hover:text-white" onClick={() => void signOut()}>
             <LogOut size={15} /> Sign out
           </button>

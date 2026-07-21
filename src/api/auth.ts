@@ -3,8 +3,6 @@ import { apiClient } from './client'
 export type Owner = {
   id: string
   name: string
-  email: string
-  confirmed: boolean
   approved: boolean
 }
 
@@ -13,18 +11,13 @@ export async function getSession() {
   return data.owner
 }
 
-export async function login(email: string, password: string) {
-  const { data } = await apiClient.post<{ owner: Owner }>('/auth/login', { email, password })
+export async function login(name: string, password: string) {
+  const { data } = await apiClient.post<{ owner: Owner }>('/auth/login', { name, password })
   return data.owner
 }
 
-export async function register(name: string, email: string, password: string) {
-  const { data } = await apiClient.post<{ message: string; confirmationUrl?: string }>('/auth/register', { name, email, password })
-  return data
-}
-
-export async function confirmEmail(token: string) {
-  const { data } = await apiClient.post<{ owner: Owner }>('/auth/confirm-email', { token })
+export async function register(name: string, password: string) {
+  const { data } = await apiClient.post<{ owner: Owner }>('/auth/register', { name, password })
   return data.owner
 }
 
