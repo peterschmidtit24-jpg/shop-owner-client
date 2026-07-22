@@ -1,5 +1,6 @@
 /** Operational dashboard summarizing orders, revenue, stock, and activity. */
 import { useEffect, useState } from 'react'
+import axios from 'axios'
 import { AlertTriangle, Boxes, CircleDollarSign, Menu, RefreshCw, ShoppingCart, Sparkles, Zap } from 'lucide-react'
 import { getOrders, type Order as ApiOrder, type OrderStatus as ApiOrderStatus } from '../api/orders'
 import { getProducts, type Product } from '../api/products'
@@ -9,6 +10,13 @@ import { MetricCard } from '../components/MetricCard'
 import { RecentOrdersList, type Order as RecentOrder, type OrderStatus } from '../components/RecentOrdersList'
 
 type DashboardPageProps = { onOpenMenu: () => void; onNavigate: (page: string) => void }
+
+function dashboardErrorMessage(error: unknown) {
+  if (axios.isAxiosError(error) && error.response?.status === 401) {
+    return 'Your session has expired. Please sign out and sign in again.'
+  }
+  return 'Could not load dashboard data. Check your connection and try again.'
+}
 
 /** Aggregates product and order data into dashboard metrics and lists. */
 export function DashboardPage({ onOpenMenu, onNavigate }: DashboardPageProps) {
@@ -28,7 +36,7 @@ export function DashboardPage({ onOpenMenu, onNavigate }: DashboardPageProps) {
       setOrders(serverOrders)
     } catch (requestError) {
       console.error('Could not load dashboard:', requestError)
-      setError('Could not load dashboard data. Check that the server is running.')
+      setError(dashboardErrorMessage(requestError))
     } finally {
       setIsLoading(false)
     }
@@ -44,7 +52,7 @@ export function DashboardPage({ onOpenMenu, onNavigate }: DashboardPageProps) {
       .catch((requestError: unknown) => {
         if (controller.signal.aborted) return
         console.error('Could not load dashboard:', requestError)
-        setError('Could not load dashboard data. Check that the server is running.')
+        setError(dashboardErrorMessage(requestError))
       })
       .finally(() => {
         if (!controller.signal.aborted) setIsLoading(false)
